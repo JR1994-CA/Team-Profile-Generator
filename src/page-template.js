@@ -1,7 +1,7 @@
 //create function that takes in an array of employees
 
 const generatePage = employees => {
-    
+
 
     let output = `<!DOCTYPE html>
     <html lang="en">
@@ -29,27 +29,99 @@ const generatePage = employees => {
     
             </div>
             <div class="row">`;
+
+    // Loop over all employees
+    // output += employee card with info
+
+    const manager = manager => {
+        return `
+                <div class="col-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2>Name: ${manager.getName()}</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h2>Role: ${manager.getId()}</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>email: ${manager.getEmail()}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>id</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>wildcard: ${manager.getOfficeNumber()}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
     
-            // Loop over all employees
-            // output += employee card with info
+                </div>`
+    }
+    const engineer = engineer => {
+        return `
+                <div class="col-4">
+                    <div class="row">
+                        <div class="col-12">
+                            <h2>Name: ${engineer.getName()}</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <h2>Role: ${engineer.getId()}</h2>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>email: ${engineer.getEmail()}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>id</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <p>wildcard: ${engineer.getGitHub()}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
     
-            employees.forEach(employee => {
-                const card = `<div class="col-4">
+                </div>`
+    }
+
+    const intern = intern => {
+        return `
+            <div class="col-4">
                 <div class="row">
                     <div class="col-12">
-                        <h2>Name: ${employee.name}</h2>
+                        <h2>Name: ${intern.getName()}</h2>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
-                        <h2>Role: ${employee.id}</h2>
+                        <h2>Role: ${intern.getId()}</h2>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-12">
                         <div class="row">
                             <div class="col-12">
-                                <p>email: ${employee.email}</p>
+                                <p>email: ${intern.getEmail()}</p>
                             </div>
                         </div>
                         <div class="row">
@@ -59,19 +131,19 @@ const generatePage = employees => {
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <p>wildcard: ${employee.wildcard}</p>
+                                <p>wildcard: ${intern.getSchool()}</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
             </div>`
-            })
+    }
 
 
 
 
-            output += `        <!--end of employee card-->
+    output += `        <!--end of employee card-->
             </div>
     
     
