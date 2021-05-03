@@ -4,58 +4,38 @@ const Intern = require('./lib/Intern');
 const inquirer = require('inquirer');
 const path = require('path');
 const fs = require('fs');
-const util = require('util');
-const { writeFile, copyFile } = require('./utils/save-html.js');
 
 
-const generatePage = require('./src/page-template.js');
+const OUTPUT_DIR = path.resolve(__dirname, "dist");
+const outputPath = path.join(OUTPUT_DIR, "team.html");
+
+
+
+const render = require('./lib/htmlRenderer');
 const Employee = require('./lib/Employee');
 
+const employees = [];
 
-const questions = () => {
-  const employees = [];
-  return inquirer.prompt([
+function questions() {
+  
+  inquirer.prompt([
     {
       type:'input',
       name: 'name',
       message: "What's the employee's name?",
-      // validate: nameInput => {
-      //   if(nameInput) {
-      //     return true;
-      //   }
-      //   else {
-      //     console.log("Please enter your employee's name:");
-      //     return false;
-      //   }
-      // }
+     
     },
     {
       type:'input',
       name: 'id',
       message: "What's the employee's ID?",
-      // validate: idInput => {
-      //   if(idInput) {
-      //     return true;
-      //   }
-      //   else {
-      //     console.log("Please enter your employee's ID:");
-      //     return false;
-      //   }
-      // }
+      
     },
     {
       type:'input',
       name: 'email',
       message: "What's the employee's email?",
-      // validate: emailInput => {
-      //   if(emailInput) {
-      //     return true;
-      //   }
-      //   else {
-      //     console.log("Please enter your employee's email:");
-      //     return false;
-      //   }
-      // }
+   
     },
     { 
       type:'list',
@@ -64,76 +44,106 @@ const questions = () => {
       choices: ['Manager', 'Engineer', 'Intern']
     },
   ])
-  .then(employeeData => {
-    employees.push(employeeData);
-    if(employeeData.role === 'Manager') {
-      return inquirer.prompt(questionForManager);
-    }
-    else if(employeeData.role === 'Engineer'){
-      return inquirer.prompt(questionForEngineer);
-    }
-    else if(employeeData.role === 'Intern'){
-      return inquirer.prompt(questionForIntern);
+  .then(function(answers){
+    if(answers.role === 'Engineer') {
+      questionsEng(answers);
+    } else if (answers.role === 'Manager') {
+      questionsMan(answers);
     }
     else {
-      return employeeData;
+      questionsInt(answers);
     }
   })
 }
 
-const questionForManager = [
-  { name: 'officeNumber', message: "What's the manager's office number" },
-];
+function questionsEng(prevAnswers) {
+  inquirer.prompt([
+    {
+      type: "input",
+      message: "What's their Github?",
+      name: 'github',
+    },
+    {
+      type: "confirm",
+      message: "Would you like to add another employee?",
+      name: "adding",
+    }
 
-const questionForEngineer = [
-  { name: 'github', message: "What's the Engineer's github" },
-];
-
-const questionForIntern = [
-  { name: 'school', message: "What's the Intern's school" },
-];
-
-
-const confirm = [
-  {
-    type: 'confirm',
-    name: 'adding',
-    message: 'Do you want to input more employee information',
-  },
-];
-
-const writeToFile = (fileName, data) => {
-
-  fs.writeFile(fileName, generatePage(data), function(err) {
-    
-    if(err) {
-      rejects(err)
+  ])
+  .then(function(answers) {
+    const newEngineer = new Engineer(prevAnswers.name, prevAnswers.id, prevAnswers.email, answers.github);
+    employees.push(newEngineer);
+    if(answers.adding === true){
+      questions()
     }
     else {
-      console.log("HTML created!!");
+      buildTeam();
+      console.log("rendered!");
+    }
+  })
+
+}
+function questionsMan(prevAnswers) {
+  inquirer.prompt([
+    {
+      type: "input",
+      message: "What's their office number?",
+      name: 'officeNumber',
+    },
+    {
+      type: "confirm",
+      message: "Would you like to add another employee?",
+      name: "adding",
+    }
+
+  ])
+  .then(function(answers) {
+    const newManager = new Manager(prevAnswers.name, prevAnswers.id, prevAnswers.email, answers.officeNumber);
+    employees.push(newManager);
+    if(answers.adding === true){
+      questions()
+    }
+    else {
+      buildTeam();
+      console.log("rendered!");
+    }
+  })
+
+}
+function questionsInt(prevAnswers) {
+  inquirer.prompt([
+    {
+      type: "input",
+      message: "Where do they go to school?",
+      name: 'school',
+    },
+    {
+      type: "confirm",
+      message: "Would you like to add another employee?",
+      name: "adding",
+    }
+
+  ])
+  .then(function(answers) {
+    const newIntern = new Intern(prevAnswers.name, prevAnswers.id, prevAnswers.email, answers.school);
+    employees.push(newIntern);
+    if(answers.adding === true){
+      questions()
+    }
+    else {
+      buildTeam();
+      console.log("rendered!");
     }
   })
 
 }
 
+function buildTeam() {
+  if(!fs.existsSync(OUTPUT_DIR)) {
+    fs.mkdirSync(OUTPUT_DIR)
+  }
+  fs.writeFileSync(outputPath, render(employees), "utf-8");
+}
 
-questions()
-  .then(generateWildCard)
-  .then(function(data) {
-    generatePage(data);
-  })
-  .then(pageHTML => {
-    return writeFile(pageHTML);
-  })
-  .then(writeFileResponse => {
-    console.log(writeFileResponse);
-    return copyFile();
-  })
-  .then(copyFileResponse => {
-    console.log(copyFileResponse);
-  })
-  .catch(err => {
-    console.log(err);
-  });
-
+questions();
 
